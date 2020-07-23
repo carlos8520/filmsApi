@@ -1,8 +1,9 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
-const { check, validationResult } = require("express-validator");
-
 const { User } = require("../../db");
+const { check, validationResult } = require("express-validator");
+const moment = require("moment");
+const jwt = require("jwt-simple");
 
 router.post(
   "/register",
@@ -22,5 +23,29 @@ router.post(
     res.json(user);
   }
 );
+
+router.post("/login", async (req, res) => {
+  const user = await User.findOne({ where: { email: req.body.email } });
+  if (user) {
+    const iguales = bcrypt.compareSync(req.body.password, user.password);
+    if (iguales) {
+      res.json({ success: createToken(user) });
+    } else {
+      res.json({ error: "error en username o contraseña illo" });
+    }
+  } else {
+    res.json({ error: "error en username o contraseña illo" });
+  }
+});
+
+const createToken = (user) => {
+  const payload = {
+    usuarioId: user.id,
+    createdAt: moment().unix(),
+    expiredAt: moment().add(5, "minutes").unix(),
+  };
+
+  return jwt.encode(payload, "frase ssecreta");
+};
 
 module.exports = router;
