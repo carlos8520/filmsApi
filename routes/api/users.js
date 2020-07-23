@@ -45,7 +45,7 @@ const createToken = (user) => {
     expiredAt: moment().add(5, "minutes").unix(),
   };
 
-  return jwt.encode(payload, "frase ssecreta");
+  return jwt.encode(payload, "frase secreta");
 };
 
 module.exports = router;
